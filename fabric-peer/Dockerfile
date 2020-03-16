@@ -1,5 +1,6 @@
 FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
 
+RUN  mkdir /etc/apt/sources.list
 # RUN mkdir /var/hyperledger/bin \
 #  && mkdir /var/hyperledger/chaincode \
 #  && chown -R :0 /etc/hyperledger \
@@ -14,6 +15,7 @@ FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
 #  && apt-get -y install rsync \
 #  && apt-get -y install nano \
 #  && apt-get -y install joe \
+
 #  && apt-get -y install less\
 #  && apt-get -y install p7zip-full \
 #  && apt-get -y install telnet
