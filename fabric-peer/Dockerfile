@@ -1,6 +1,6 @@
 FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
 
-RUN  mkdir /etc/apt/sources.list
+#RUN  mkdir /etc/apt/sources.list
 # RUN mkdir /var/hyperledger/bin \
 #  && mkdir /var/hyperledger/chaincode \
 #  && chown -R :0 /etc/hyperledger \
