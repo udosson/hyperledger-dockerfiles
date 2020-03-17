@@ -1,0 +1,7 @@
+
+oc new-app --file=./fabric-peer-couchdb-deploy
+
+
+
+find /Users/robinklemens/Documents/GitHub/hyperledger-fabric-openshift/infrastructure -name "*build.yaml" -print | xargs -n 1 /Users/robinklemens/Documents/GitHub/hyperledger-fabric-openshift/infrastructure/create-or-replace-template.sh bc-platform-hlf oc
+/Users/robinklemens/Documents/GitHub/hyperledger-fabric-openshift/infrastructure/

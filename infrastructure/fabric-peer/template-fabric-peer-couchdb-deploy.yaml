@@ -1,0 +1,422 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: fabric-peer-couchdb-deploy
+  annotations:
+    description: The Hyperledger Peer and the associated CouchDB used by the Hyperledger network.
+    tags: hyperledger,Fabric,Orderer,fabric-peer,peer,couchdb
+
+labels:
+  createdBy: fabric-peer-template
+
+parameters:
+#docker image of build
+- name: APPLICATION_PEER_BASE_NAME
+  value: fabric-peer
+  displayName: Application base name
+  description: The base name of the application.
+
+- name: APPLICATION_COUCHDB_BASE_NAME
+#docker image of build
+  value: couchdb
+  displayName: Application base name
+  description: The base name of the application.
+  
+- name: APPLICATION_NAME
+  value: test3
+  required: true
+  displayName: Application name
+  description: The name for the application. The service will be named like the application.
+
+# PVC
+# MSP noch mal anschauen. evtl in fabric/config für alle peers und orderer?
+# --> in fabricfiles unter /fabric/crypto-config (CORE_PEER_MSPCONFIGPATH)
+# - name: PVC_NAME_PEER_MSP_DATA
+#   value: 
+#   required: true
+#   displayName: PVC name of /etc/hyperledger/fabric/msp
+#   description: PVC name for fabric-peer MSP data volume
+
+# raus, da alles auf pvc fabricfiles  
+# --> in fabricfiles unter /fabric/crypto-config (Pfade als env gesetzt)
+# - name: PVC_NAME_PEER_TLS_DATA
+#   value: 
+#   required: true
+#   displayName: PVC name of /etc/hyperledger/fabric/tls
+#   description: PVC name for fabric-peer TLS data volume  
+
+# könnte raus, mal schauen
+# --> TODO: Sinnhaftigkeit prüfen
+# - name: PVC_NAME_BIN_DATA
+#   value: fabric-bin
+#   required: true
+#   displayName: PVC name of /var/hyperledger/bin
+#   description: PVC name for fabric-bin data volume
+  
+- name: PVC_SIZE_COUCHDB_DATA
+  value: 1Gi
+  displayName: /opt/couchdb/data volume size
+  description: Volume size for the CouchDB data volume
+  
+# Peer configuration parameters
+
+- name: ENV_PEER_LOCALMSPID
+  value: lala
+  required: true
+  displayName: ID of the MSP definition as specified in configtx.yaml
+  description: ID of the MSP definition as specified in configtx.yaml (Organizations/../ID; e.g. DBSystelMSP).
+
+- name: ENV_PEER_GOSSIP_EXTERNALENDPOINT
+  value: lala
+  required: true
+  displayName: The peer address used for cross-organizational gossip communication
+  description: The peer address used for cross-organizational gossip communication. (Organizations/../AnchorPeers/Host; e.g. fabric-peer-dbsystel-bcdltce.inet-abnahme.ose.db.de:7051)
+
+
+objects:
+# raus
+# - apiVersion: v1
+#   kind: PersistentVolumeClaim
+#   metadata:
+#     name: chaincode-${APPLICATION_NAME}
+#     annotations:
+#       volume.beta.kubernetes.io/storage-class: efs
+#   spec:
+#     accessModes:
+#     - ReadWriteMany
+#     resources:
+#       requests:
+#         storage: 1Gi
+
+- apiVersion: v1
+#Pfad checken
+  kind: PersistentVolumeClaim
+  metadata:
+    name: ${APPLICATION_NAME}-production
+    annotations:
+      volume.beta.kubernetes.io/storage-class: efs
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+        
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: ${APPLICATION_NAME}-couchdb
+    annotations:
+      volume.beta.kubernetes.io/storage-class: efs
+  spec:
+    accessModes:
+    - ReadWriteMany
+    resources:
+      requests:
+        storage: ${PVC_SIZE_COUCHDB_DATA}
+        
+# DeploymentConfig for deploying the fabric-peer build
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+  spec:
+  # The replicas count seems to be erroneous, because startup of the pod fails.
+  # Without replicas count, deployment succeeds and the pod needs to be scaled up manually.
+  #    replicas: 1
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+      name: ${APPLICATION_NAME}
+    strategy:
+      type: Recreate
+      recreateParams:
+        timeoutSeconds: 180
+#      type: Rolling
+#      rollingParams:
+#        updatePeriodSeconds: 5
+#        intervalSeconds: 5
+        # give the service some time to start-up
+#        timeoutSeconds: 180
+    test: false
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - couchdb-${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APPLICATION_COUCHDB_BASE_NAME}:latest
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - ${APPLICATION_NAME}
+        from:
+          kind: ImageStreamTag
+          name: ${APPLICATION_PEER_BASE_NAME}:latest
+    template:
+      metadata:
+        name: ${APPLICATION_NAME}
+        labels:
+          app: ${APPLICATION_NAME}
+          deploymentconfig: ${APPLICATION_NAME}
+          name: ${APPLICATION_NAME}
+      spec:
+        serviceAccount: deployer
+        containers:
+        - name: couchdb-${APPLICATION_NAME}
+          image: ${APPLICATION_COUCHDB_BASE_NAME}:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+          # ports CouchDB anpassen
+          - containerPort: 5984
+            protocol: TCP
+          - containerPort: 4369
+            protocol: TCP
+
+          readinessProbe:
+            tcpSocket:
+              port: 5984
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+
+          env:
+          - name: TZ
+            value: "Europe/Amsterdam"
+          # - name: COUCHDB_USER
+          #   value: ""
+          # - name: COUCHDB_PASSWORD
+          #   value: ""
+      
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          #specify volume mounts
+          volumeMounts:
+          - mountPath: /opt/couchdb/data
+            name: couchdb-volume-1
+
+        - name: ${APPLICATION_NAME}
+          image: ${APPLICATION_PEER_BASE_NAME}:latest
+          imagePullPolicy: IfNotPresent
+#for preparation only
+          # command anpassen
+          command: ["sh", "-c", "peer node start"]
+          # command:
+          # - /var/hyperledger/bin/peer
+          # args:
+          # - node
+          # - start
+#          command:
+#          - bash
+#          stdin: true
+#          tty: true
+#---
+          #ports anpassen
+          ports:
+          - containerPort: 30110
+            protocol: TCP
+          - containerPort: 30111
+            protocol: TCP
+
+          readinessProbe:
+            tcpSocket:
+              port: 30110
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+
+          #env prüfen, anpassen und generisch erstellen
+          env:
+          - name: TZ
+            value: "Europe/Amsterdam"
+          - name: PROJECT_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace 
+          - name: CORE_PEER_ID
+            value: org1peer0
+            #value: ${APPLICATION_NAME}.$(PROJECT_NAMESPACE).svc
+          - name: CORE_PEER_ADDRESS
+            value: org1peer0:30110
+            #${APPLICATION_NAME}.$(PROJECT_NAMESPACE).svc:30110
+          - name: CORE_PEER_LISTENADDRESS
+            value: 0.0.0.0:30110
+          - name: CORE_PEER_EVENTS_ADDRESS
+            value: 0.0.0.0:30111
+          - name: CORE_PEER_GOSSIP_BOOTSTRAP
+            value: org1peer1:30110
+            #${APPLICATION_NAME_ORE_PEER_GOSSIP}.$(PROJECT_NAMESPACE).svc:30110
+          - name: CORE_PEER_GOSSIP_EXTERNALENDPOINT
+            value: org1peer0:30110
+            #${APPLICATION_NAME}.$(PROJECT_NAMESPACE).svc:30110
+          - name: CORE_PEER_LOCALMSPID
+            value: Org1MSP
+            #value: ${ENV_PEER_LOCALMSPID}
+          - name: CORE_PEER_ADDRESSAUTODETECT
+            value: "true"
+          - name: CORE_PEER_GOSSIP_ORGLEADER
+            value: "false"
+          - name: CORE_PEER_GOSSIP_USELEADERELECTION
+            value: "true"
+          - name: CORE_PEER_PROFILE_ENABLED
+            value: "true"
+          - name: CORE_PEER_MSPCONFIGPATH
+            value: /fabric/crypto-config/peerOrganizations/org1.example.com/peers/org1peer0/msp/
+            #value: /fabric/crypto-config/peerOrganizations/${PEER_ORG_DOMAIN}/peers/${$HOST}/msp/
+          - name: FABRIC_LOGGING_SPEC
+            value: debug
+          - name: CORE_PEER_TLS_ENABLED
+            value: "true"
+          - name: CORE_PEER_TLS_CERT_FILE
+            value: /fabric/crypto-config/peerOrganizations/org1.example.com/peers/org1peer0/tls/server.crt
+            #value: /fabric/crypto-config/peerOrganizations/${PEER_ORG_DOMAIN}/peers/${$HOST}/tls/server.crt
+          - name: CORE_PEER_TLS_KEY_FILE
+            value: /fabric/crypto-config/peerOrganizations/org1.example.com/peers/org1peer0/tls/server.key
+            #value: /fabric/crypto-config/peerOrganizations/${PEER_ORG_DOMAIN}/peers/${$HOST}/tls/server.key
+          - name: CORE_PEER_TLS_ROOTCERT_FILE
+            value: /fabric/crypto-config/peerOrganizations/org1.example.com/peers/org1peer0/tls/ca.crt
+            #value: /fabric/crypto-config/peerOrganizations/${PEER_ORG_DOMAIN}/peers/${$HOST}/tls/ca.crt
+          - name: CORE_LEDGER_STATE_STATEDATABASE
+            value: "CouchDB"
+          - name: CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS
+            value: 0.0.0.0:5984
+          - name: FABRIC_CFG_PATH
+            value: /fabric/config/
+          - name: CORE_CHAINCODE_EXECUTETIMEOUT
+            value: 300s
+          - name: GODEBUG
+            value: "netdns=go"
+
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          #specify volume mounts
+
+          # hier anpassen. Oben schauen wie
+          volumeMounts:
+          # - mountPath: /etc/hyperledger/fabric/msp
+          #   name: peer-volume-1
+          # - mountPath: /etc/hyperledger/fabric/tls
+          #   name: peer-volume-2
+          # - mountPath: /var/hyperledger/bin
+          #   name: peer-volume-3
+          # - mountPath: /var/hyperledger/chaincode
+          #   name: peer-volume-4
+          - mountPath: /var/hyperledger/production
+            name: peer-volume-5
+          - mountPath: /fabric
+            name: fabricfiles
+          
+
+        # link volumes to volume claims
+        # hier anpassen. Oben schauen wie
+        volumes:
+        # - persistentVolumeClaim:
+        #     claimName: ${PVC_NAME_PEER_MSP_DATA}
+        #   name: peer-volume-1
+        # - persistentVolumeClaim:
+        #     claimName: ${PVC_NAME_PEER_TLS_DATA}
+        #   name: peer-volume-2
+        # - persistentVolumeClaim:
+        #     claimName: ${PVC_NAME_BIN_DATA}
+        #   name: peer-volume-3
+        # - persistentVolumeClaim:
+        #     claimName: chaincode-${APPLICATION_NAME}
+        #   name: peer-volume-4
+        - persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}-production
+          name: peer-volume-5
+        - persistentVolumeClaim:
+            claimName: ${APPLICATION_NAME}-couchdb
+          name: couchdb-volume-1
+        - persistentVolumeClaim:
+            claimName: fabric-pvc
+          name: fabricfiles
+        
+        # Used to fix the container to a specific AWS zone
+        nodeSelector:
+          zone: eu-central-1a
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+
+# Specify the fabric-peer services
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: ${APPLICATION_NAME}
+      run: 
+    name: ${APPLICATION_NAME}
+  spec:
+    ports:
+    # ports anpassen
+    # - name: 7051-tcp
+    #   port: 7051
+    #   protocol: TCP
+    #   targetPort: 7051
+    # - name: 7052-tcp
+    #   port: 7052
+    #   protocol: TCP
+    #   targetPort: 7052
+    # - name: 7053-tcp
+    #   port: 7053
+    #   protocol: TCP
+    #   targetPort: 7053
+    - protocol: TCP
+      port: 30110
+      name: grpc
+    - protocol: TCP
+      port: 30111
+      name: events
+    - protocol: TCP
+      port: 5984
+      name: couchdb-localhost
+    - protocol: TCP
+      port: 4369
+      name: couchdb-epmd
+    selector:
+      app: ${APPLICATION_NAME}
+      deploymentconfig: ${APPLICATION_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+
+
+#--> Service oben mit erstellt. TODO: TESTING
+# - apiVersion: v1
+#   kind: Service
+#   metadata:
+#     labels:
+#       app: ${APPLICATION_NAME}
+#     name: ${APPLICATION_NAME}-couchdb
+#   spec:
+#     ports:
+#     #ports anpassen
+#     - name: 5984-tcp
+#       port: 5984
+#       protocol: TCP
+#       targetPort: 5984
+#     - name: 5986-tcp
+#       port: 5986
+#       protocol: TCP
+#       targetPort: 5986
+#     - name: 4369-tcp
+#       port: 4369
+#       protocol: TCP
+#       targetPort: 4369
+#     - name: 9100-tcp
+#       port: 9100
+#       protocol: TCP
+#       targetPort: 9100
+#     selector:
+#       app: ${APPLICATION_NAME}
+#       deploymentconfig: ${APPLICATION_NAME}
+#     sessionAffinity: None
+#     type: ClusterIP

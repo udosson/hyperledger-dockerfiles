@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: fabric-orderer-build
+  annotations:
+    description: The Hyperledger Orderer used by the Hyperledger network.
+    tags: hyperledger,Fabric,Orderer,fabric-orderer,peer
+
+labels:
+  createdBy: fabric-orderer-template
+
+parameters:
+- name: APPLICATION_NAME
+  value: fabric-orderer
+  displayName: Application name
+  description: The name for the application. The service will be named like the application.
+
+- name: DOCKERFILE_SOURCE_LOCATION
+  value: https://github.com/udosson/hyperledger-dockerfiles.git
+  displayName: Dockerfile source location for building fabric-orderer
+  description: Source location of fabric-orderer's Dockerfile 
+
+- name: SOURCE_CONTEXT
+  value: fabric-orderer/
+  displayName: Dockerfile's subdirectory in the cloned repository
+  description: Subdirectory in the cloned repository where the Dockerfile is located
+
+
+objects:
+
+# ImageStream to store the transformed fabric-orderer image
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      app: ${APPLICATION_NAME}
+      build: ${APPLICATION_NAME}
+
+# BuildConfig for building the fabric-orderer image
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    name: ${APPLICATION_NAME}
+    labels:
+      build: ${APPLICATION_NAME}
+  spec:
+    serviceAccount: builder
+    runPolicy: Serial
+    source:
+      type: Git
+      git:
+        uri: ${DOCKERFILE_SOURCE_LOCATION}
+      contextDir: ${SOURCE_CONTEXT}
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${APPLICATION_NAME}:latest
+    strategy:
+      type: Docker
+      dockerStrategy:
+        dockerfilePath: Dockerfile
+    triggers:
+    - type: ImageChange
+    - type: ConfigChange
