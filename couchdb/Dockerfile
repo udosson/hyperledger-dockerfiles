@@ -61,8 +61,8 @@ FROM hyperledger/fabric-couchdb:0.4.18
 #Prepare folder access rights
 RUN chown -R :0 /opt/couchdb/ \
  && chmod -R g+rwx /opt/couchdb/ \
- && sed -i 's/; admin = admin/;admin = mysecretpassword/' /docker-entrypoint.sh \
- && sed -i 's/chown.*//g' /docker-entrypoint.sh \
- && sed -i 's/su-exec couchdb \"$@\"/exec \"$@\"/g' /docker-entrypoint.sh
+#  && sed -i 's/; admin = admin/;admin = mysecretpassword/' /docker-entrypoint.sh \
+#  && sed -i 's/chown.*//g' /docker-entrypoint.sh \
+#  && sed -i 's/su-exec couchdb \"$@\"/exec \"$@\"/g' /docker-entrypoint.sh
 
-RUN echo alias ll='ls -l --color=auto' >> /etc/profile
+# RUN echo alias ll='ls -l --color=auto' >> /etc/profile
