@@ -3,10 +3,10 @@ FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
 #RUN  mkdir /etc/apt/sources.list
 # RUN mkdir /var/hyperledger/bin \
 #  && mkdir /var/hyperledger/chaincode \
-#  && chown -R :0 /etc/hyperledger \
-#  && chmod -R a+w /etc/hyperledger \
-#  && chown -R :0 /var/hyperledger \
-#  && chmod -R a+w /var/hyperledger
+RUN chown -R :0 /etc/hyperledger \
+ && chmod -R a+w /etc/hyperledger \
+ && chown -R :0 /var/hyperledger \
+ && chmod -R a+w /var/hyperledger
 
 # RUN echo "deb http://de.archive.ubuntu.com/ubuntu bionic main universe" >> /etc/apt/sources.list \
 #  && apt-get -y update \
@@ -19,7 +19,7 @@ FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
 #  && apt-get -y install less\
 #  && apt-get -y install p7zip-full \
 #  && apt-get -y install telnet
-RUN echo alias ll='ls -l --color=auto' >> /etc/profile
+# RUN echo alias ll='ls -l --color=auto' >> /etc/profile
 # RUN touch /.bash_history \
 #  && cp /root/.bash* / \
 #  && chown -R :0 /.bash* \
