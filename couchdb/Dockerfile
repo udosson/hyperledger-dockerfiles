@@ -77,12 +77,12 @@ RUN chmod +x /docker-entrypoint.sh \
 #  && chmod -R g+rwx /opt/couchdb/ 
 
  
-WORKDIR /opt/couchdb
-EXPOSE 5984 4369 9100
+# WORKDIR /opt/couchdb
+# EXPOSE 5984 4369 9100
 
-USER couchdb
+# USER couchdb
 
-VOLUME ["/opt/couchdb/data"]
+# VOLUME ["/opt/couchdb/data"]
 
-ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
-CMD ["/opt/couchdb/bin/couchdb"]
+# ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+# CMD ["/opt/couchdb/bin/couchdb"]
