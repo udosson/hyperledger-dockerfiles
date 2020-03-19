@@ -60,8 +60,8 @@ FROM hyperledger/fabric-couchdb:0.4.18
 #  && echo bind_address = 0.0.0.0 >> /opt/couchdb/etc/local.ini
 
 #Prepare folder access rights
-RUN chown -R :0 /opt/couchdb/ \
- && chmod -R g+rwx /opt/couchdb/ 
+# RUN chown -R :0 /opt/couchdb/ \
+#  && chmod -R g+rwx /opt/couchdb/ 
 #  && sed -i 's/; admin = admin/;admin = mysecretpassword/' /docker-entrypoint.sh \
 #  && sed -i 's/chown.*//g' /docker-entrypoint.sh \
 #  && sed -i 's/su-exec couchdb \"$@\"/exec \"$@\"/g' /docker-entrypoint.sh
@@ -70,12 +70,11 @@ RUN chown -R :0 /opt/couchdb/ \
 
 # Setup directories and permissions
 RUN chmod +x /docker-entrypoint.sh \
- && mkdir /opt/couchdb/data /opt/couchdb/etc/default.d /opt/couchdb/etc/local.d \
- && chown -R couchdb:couchdb /opt/couchdb/ \
+ && chown -R :0 /opt/couchdb/ \
  && chmod -R g+rwx /opt/couchdb/ 
 
-RUN chown -R :0 /opt/couchdb/ \
- && chmod -R g+rwx /opt/couchdb/ 
+# RUN chown -R :0 /opt/couchdb/ \
+#  && chmod -R g+rwx /opt/couchdb/ 
 
  
 WORKDIR /opt/couchdb
