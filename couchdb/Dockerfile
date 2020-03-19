@@ -125,8 +125,8 @@ FROM hyperledger/fabric-couchdb:latest
 
 # Setup directories and permissions
 RUN chmod +x /docker-entrypoint.sh \
- && chown -R couchdb:couchdb /opt/couchdb/etc/default.d/ /opt/couchdb/etc/vm.args \
- && chmod -R 0770 /opt/couchdb/data \
- && chmod 664 /opt/couchdb/etc/*.ini \
- && chmod 664 /opt/couchdb/etc/default.d/*.ini \
- && chmod 775 /opt/couchdb/etc/*.d
+ && chown -R :0 /opt/couchdb/etc/default.d/ /opt/couchdb/etc/vm.args \
+ && chmod -R g+rwx  /opt/couchdb/data \
+ && chmod g+rwx  /opt/couchdb/etc/*.ini \
+ && chmod g+rwx  /opt/couchdb/etc/default.d/*.ini \
+ && chmod g+rwx  /opt/couchdb/etc/*.d
