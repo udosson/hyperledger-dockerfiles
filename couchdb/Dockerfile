@@ -1,88 +1,145 @@
-FROM hyperledger/fabric-couchdb:0.4.18
+# Copyright Greg Haskins All Rights Reserved
+# SPDX-License-Identifier: Apache-2.0
+# Based on https://github.com/apache/couchdb-docker/blob/master/2.1.1/Dockerfile
 
-# #install the most recent version of CouchDB
-# RUN echo "deb https://apache.bintray.com/couchdb-deb xenial main" | tee -a /etc/apt/sources.list \
-#  && curl -L https://couchdb.apache.org/repo/bintray-pubkey.asc | apt-key add -
+FROM debian:stretch-20190910-slim
 
-# RUN mv /opt/couchdb/etc/default.ini /opt/couchdb/etc/default.ini.bak \
-#  && mv /opt/couchdb/etc/local.ini /opt/couchdb/etc/local.ini.bak \
-#  && mv /opt/couchdb/etc/vm.args /opt/couchdb/etc/vm.args.bak
-# RUN echo "couchdb couchdb/mode select none" | debconf-set-selections
+# Add CouchDB user account
+RUN groupadd -g 5984 -r couchdb && useradd -u 5984 -d /opt/couchdb -g couchdb couchdb
 
-# RUN apt-get -y update
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    erlang-nox \
+    erlang-reltool \
+    libicu57 \
+    libmozjs185-1.0 \
+    openssl \
+    dirmngr \
+    gnupg \
+  && rm -rf /var/lib/apt/lists/*
 
-# RUN apt-get -y clean
-# RUN apt-get -y -f install
-# RUN dpkg --configure -a
-# RUN apt-get -y -f install
-# RUN apt -y autoremove
-# RUN apt-get -y dist-upgrade
+# grab gosu for easy step-down from root and tini for signal handling
+# see https://github.com/apache/couchdb-docker/pull/28#discussion_r141112407
+ENV GOSU_VERSION 1.10
+ENV TINI_VERSION 0.16.1
+RUN set -ex; \
+	\
+	apt-get update; \
+	apt-get install -y --no-install-recommends wget; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+	\
+# install gosu
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$dpkgArch"; \
+	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	for server in $(shuf -e ha.pool.sks-keyservers.net \
+                                hkp://p80.pool.sks-keyservers.net:80 \
+                                keyserver.ubuntu.com \
+                                hkp://keyserver.ubuntu.com:80 \
+                                pgp.mit.edu) ; do \
+		gpg --keyserver "$server" --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 && break || : ; \
+	done; \
+	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+	rm -r "$GNUPGHOME" || true; rm -r /usr/local/bin/gosu.asc || true; \
+	chmod +x /usr/local/bin/gosu; \
+	gosu nobody true; \
+	\
+# install tini
+	wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-$dpkgArch"; \
+	wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini-$dpkgArch.asc"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	for server in $(shuf -e ha.pool.sks-keyservers.net \
+                                hkp://p80.pool.sks-keyservers.net:80 \
+                                keyserver.ubuntu.com \
+                                hkp://keyserver.ubuntu.com:80 \
+                                pgp.mit.edu) ; do \
+            gpg --keyserver "$server" --recv-keys 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 && break || : ; \
+    	done; \
+	gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
+	rm -r "$GNUPGHOME" || true; rm -r /usr/local/bin/tini.asc || true; \
+	chmod +x /usr/local/bin/tini; \
+	tini --version; \
+	\
+	apt-get purge -y --auto-remove wget
 
-# RUN apt-get -y remove couchdb
-# RUN apt-get -y install couchdb
+# https://www.apache.org/dist/couchdb/KEYS
+ENV GPG_KEYS \
+  15DD4F3B8AACA54740EB78C7B7B7C53943ECCEE1 \
+  1CFBFA43C19B6DF4A0CA3934669C02FFDF3CEBA3 \
+  25BBBAC113C1BFD5AA594A4C9F96B92930380381 \
+  4BFCA2B99BADC6F9F105BEC9C5E32E2D6B065BFB \
+  5D680346FAA3E51B29DBCB681015F68F9DA248BC \
+  7BCCEB868313DDA925DF1805ECA5BCB7BB9656B0 \
+  C3F4DFAEAD621E1C94523AEEC376457E61D50B88 \
+  D2B17F9DA23C0A10991AF2E3D9EE01E47852AEE4 \
+  E0AF0A194D55C84E4A19A801CDB0C0F904F4EE9B \
+  29E4F38113DF707D722A6EF91FE9AF73118F1A7C \
+  2EC788AE3F239FA13E82D215CDE711289384AE37
+RUN set -xe \
+    && for key in $GPG_KEYS; do \
+      for server in $(shuf -e ha.pool.sks-keyservers.net \
+                              hkp://p80.pool.sks-keyservers.net:80 \
+                              keyserver.ubuntu.com \
+                              hkp://keyserver.ubuntu.com:80 \
+                              pgp.mit.edu) ; do \
+          gpg --keyserver "$server" --recv-keys "$key" && break || : ; \
+      done; \
+    done
 
-# RUN apt-get -y update \
-#  && apt-get -y upgrade
+ENV COUCHDB_VERSION 2.3.1
 
-# RUN apt-get -y install rsync \
-#  && apt-get -y install nano \
-#  && apt-get -y install joe
+# Download dev dependencies
+RUN buildDeps=' \
+    apt-transport-https \
+    gcc \
+    g++ \
+    erlang-dev \
+    libcurl4-openssl-dev \
+    libicu-dev \
+    libmozjs185-dev \
+    make \
+  ' \
+ && apt-get update -y -qq && apt-get install -y --no-install-recommends $buildDeps \
+ # Acquire CouchDB source code
+ && cd /usr/src && mkdir couchdb \
+ && curl -fSL https://archive.apache.org/dist/couchdb/source/$COUCHDB_VERSION/apache-couchdb-$COUCHDB_VERSION.tar.gz -o couchdb.tar.gz \
+ && curl -fSL https://archive.apache.org/dist/couchdb/source/$COUCHDB_VERSION/apache-couchdb-$COUCHDB_VERSION.tar.gz.asc -o couchdb.tar.gz.asc \
+ && gpg --batch --verify couchdb.tar.gz.asc couchdb.tar.gz \
+ && tar -xzf couchdb.tar.gz -C couchdb --strip-components=1 \
+ && cd couchdb \
+ # Build the release and install into /opt
+ && ./configure --disable-docs \
+ && make release \
+ && mv /usr/src/couchdb/rel/couchdb /opt/ \
+ # Cleanup build detritus
+ && apt-get purge -y --auto-remove $buildDeps \
+ && rm -rf /var/lib/apt/lists/* /usr/src/couchdb* \
+ && mkdir /opt/couchdb/data \
+ && chown -R couchdb:couchdb /opt/couchdb
 
-# RUN sed -i 's/\[couchdb\]/\[couchdb\]\n\; Specify the location of the database in container.\n\; Optionally\, these directories can be mounted in the host via docker.\ndatabase_dir \= \/opt\/couchdb\/data\/\nview_index_dir \= \/opt\/couchdb\/data\/\nuri_file \= \/opt\/couchdb\/data\/couch.uri\nmax_dbs_open \= 8000\ndelayed_commits \= true\n/' /opt/couchdb/etc/local.ini
-# RUN sed -i 's/\[couch_httpd_auth\]/\[couch_httpd_auth\]\niterations \= 1000 \; iterations for password hashing\n/' /opt/couchdb/etc/local.ini
-# RUN sed -i 's/\[chttpd\]/\[chttpd\]\nbind_address \= 0\.0\.0\.0/' /opt/couchdb/etc/local.ini
-# RUN sed -i 's/name couchdb\@127\.0\.0\.1/nonode\@nohost/g' /opt/couchdb/etc/vm.args
-# RUN echo [cluster] >> /opt/couchdb/etc/local.ini \
-# # peer maintains a single replica
-#  && echo n = 1 >> /opt/couchdb/etc/local.ini \
-# # adjust q to set the level of parallelism locally
-# # recommended to have no more than 10 million documents/shard
-# # for 100 million documents, q=10 -- at a minimum
-#  && echo q = 8 >> /opt/couchdb/etc/local.ini
-# # This is a default rule for all databases:
-# # When database fragmentation (unused versions) reaches 30% of the total file size, the database will be compacted.
-# #  && echo [compactions] >> /opt/couchdb/etc/local.ini \
-# #  && echo _default = [{db_fragmentation, \"30\%\"}, {view_fragmentation, \"30\%\"}]" >> /opt/couchdb/etc/local.ini \
+# Add configuration
+COPY ./vm.args /opt/couchdb/etc/
+COPY ./10-docker-default.ini /opt/couchdb/etc/default.d/
+COPY ./20-fabric-default.ini /opt/couchdb/etc/default.d/
 
-# # Database compaction settings.
-# # Databases will be checked every 300s
-# # Databases less than 256K in size will not be compacted
-#  RUN echo [compaction_daemon] >> /opt/couchdb/etc/local.ini \
-#  && echo check_interval = 300 >> /opt/couchdb/etc/local.ini \
-#  && echo min_file_size = 256000 >> /opt/couchdb/etc/local.ini \
-#  && echo [log] >> /opt/couchdb/etc/local.ini \
-#  && echo writer = file >> /opt/couchdb/etc/local.ini \
-#  && echo file = /opt/couchdb/logs/couchdb.log >> /opt/couchdb/etc/local.ini \
-#  && echo level = info >> /opt/couchdb/etc/local.ini \
-#  && echo [attachments] >> /opt/couchdb/etc/local.ini \
-#  && echo compressible_types = text/*, application/javascript, application/json, application/xml, application/octet-stream >> /opt/couchdb/etc/local.ini \
-#  && echo [httpd] >> /opt/couchdb/etc/local.ini \
-#  && echo bind_address = 0.0.0.0 >> /opt/couchdb/etc/local.ini
-
-#Prepare folder access rights
-# RUN chown -R :0 /opt/couchdb/ \
-#  && chmod -R g+rwx /opt/couchdb/ 
-#  && sed -i 's/; admin = admin/;admin = mysecretpassword/' /docker-entrypoint.sh \
-#  && sed -i 's/chown.*//g' /docker-entrypoint.sh \
-#  && sed -i 's/su-exec couchdb \"$@\"/exec \"$@\"/g' /docker-entrypoint.sh
-
-# RUN echo alias ll='ls -l --color=auto' >> /etc/profile
+COPY ./docker-entrypoint.sh /
 
 # Setup directories and permissions
-# RUN chmod +x /docker-entrypoint.sh \
-#  && chown -R :0 /opt/couchdb/ \
-#  && chmod -R g+rwx /opt/couchdb/ 
+RUN chmod +x /docker-entrypoint.sh \
+ && chown -R couchdb:couchdb /opt/couchdb/etc/default.d/ /opt/couchdb/etc/vm.args \
+ && chmod -R 0770 /opt/couchdb/data \
+ && chmod 664 /opt/couchdb/etc/*.ini \
+ && chmod 664 /opt/couchdb/etc/default.d/*.ini \
+ && chmod 775 /opt/couchdb/etc/*.d
 
-# RUN chown -R :0 /opt/couchdb/ \
-#  && chmod -R g+rwx /opt/couchdb/ 
+WORKDIR /opt/couchdb
+EXPOSE 5984 4369 9100
 
- 
-# WORKDIR /opt/couchdb
-# EXPOSE 5984 4369 9100
+VOLUME ["/opt/couchdb/data"]
+VOLUME ["/opt/couchdb/etc/local.d"]
 
-# USER couchdb
-
-# VOLUME ["/opt/couchdb/data"]
-
-# ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
-# CMD ["/opt/couchdb/bin/couchdb"]
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
+CMD ["/opt/couchdb/bin/couchdb"]
