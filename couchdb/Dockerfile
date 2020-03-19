@@ -69,9 +69,9 @@ FROM hyperledger/fabric-couchdb:0.4.18
 # RUN echo alias ll='ls -l --color=auto' >> /etc/profile
 
 # Setup directories and permissions
-RUN chmod +x /docker-entrypoint.sh \
- && chown -R :0 /opt/couchdb/ \
- && chmod -R g+rwx /opt/couchdb/ 
+# RUN chmod +x /docker-entrypoint.sh \
+#  && chown -R :0 /opt/couchdb/ \
+#  && chmod -R g+rwx /opt/couchdb/ 
 
 # RUN chown -R :0 /opt/couchdb/ \
 #  && chmod -R g+rwx /opt/couchdb/ 
