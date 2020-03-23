@@ -9,7 +9,7 @@ RUN chmod +x /docker-entrypoint.sh \
 # EXPOSE 5984 4369 9100
 
 # ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
-# CMD ["/opt/couchdb/bin/couchdb"]
+CMD ["/opt/couchdb/bin/couchdb"]
 
 # Official Hyperledger Fabric base image
 # Setup directories and permissions
