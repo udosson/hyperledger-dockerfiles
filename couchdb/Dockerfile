@@ -1,11 +1,9 @@
 FROM hyperledger/fabric-couchdb:0.4.18
 
 
-RUN rm -r /opt/couchdb/data \
-  && mkdir /opt/couchdb/data \
-  && chmod +x /docker-entrypoint.sh \
-  && chown -R :0 /opt/couchdb/ \
-  && chmod -R g+rwx /opt/couchdb/
+RUN chmod +x /docker-entrypoint.sh \
+  && chown -R couchdb:couchdb /opt/couchdb/ \
+  && chmod -R 777 /opt/couchdb/
  
 # WORKDIR /opt/couchdb
 # EXPOSE 5984 4369 9100
