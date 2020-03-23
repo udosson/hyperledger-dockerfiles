@@ -3,7 +3,7 @@ FROM hyperledger/fabric-couchdb:0.4.18
 # Edit docker-entrypoint. rmv all chwon and find commands and rmv gosu
 RUN sed -i 's/chown.*//g' /docker-entrypoint.sh \
 && sed -i 's/gosu//g' /docker-entrypoint.sh \
-&& sed -i 's/find.*//g' / docker-entrypoint.sh
+&& sed -i 's/find.*//g' /docker-entrypoint.sh
 
 # Change permission of production directory to root
 RUN chmod +x /docker-entrypoint.sh \
