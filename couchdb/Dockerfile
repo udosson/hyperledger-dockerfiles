@@ -2,7 +2,7 @@ FROM hyperledger/fabric-couchdb:0.4.18
 
 
 RUN chmod +x /docker-entrypoint.sh \
-RUN chown -R :0 /opt/couchdb/ \
+  && chown -R :0 /opt/couchdb/ \
   && chmod -R g+rwx /opt/couchdb/
  
 # WORKDIR /opt/couchdb
