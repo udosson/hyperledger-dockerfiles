@@ -1,6 +1,5 @@
 FROM hyperledger/fabric-couchdb:0.4.18
 
-RUN groupadd -g 5984 -r couchdb && useradd -u 5984 -d /opt/couchdb -g couchdb couchdb
 
 RUN chmod +x /docker-entrypoint.sh \
  && chown -R couchdb:couchdb /opt/couchdb/ \
