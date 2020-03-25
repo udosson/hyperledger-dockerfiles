@@ -1,5 +1,4 @@
-FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
-
+FROM hyperledger/fabric-tools:2.0
 
 # Install additional packages
 RUN apk add --no-cache \

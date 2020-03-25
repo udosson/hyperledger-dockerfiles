@@ -1,9 +1,23 @@
 FROM hyperledger/fabric-orderer:2.0
+
+# Install additional packages
+RUN apk add --no-cache \
+	libltdl7 \
+	rsync \
+	nano \
+	joe \
+	less \
+    p7zip-full \
+    telnet
+
+# Fix permissions
 RUN mkdir /var/hyperledger/bin \
  && chown -R :0 /etc/hyperledger \
  && chmod -R a+w /etc/hyperledger \
  && chown -R :0 /var/hyperledger \
  && chmod -R a+w /var/hyperledger
+
+
 # RUN apt-get -y update \
 #  && apt-get -y upgrade \
 #  && apt-get -y install libltdl7 \
