@@ -2,13 +2,13 @@ FROM hyperledger/fabric-tools:2.0
 
 # Install additional packages
 RUN apk add --no-cache \
-	libltdl7 \
+	libltdl \
 	rsync \
 	nano \
 	joe \
 	less \
-    p7zip-full \
-    telnet
+    p7zip \
+    busybox-extras
 
 # Fix permissions
 RUN mkdir /var/hyperledger/production \
