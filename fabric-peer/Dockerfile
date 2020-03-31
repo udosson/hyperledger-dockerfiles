@@ -16,7 +16,11 @@ RUN mkdir /var/hyperledger/production \
  && chown -R :0 /etc/hyperledger \
  && chmod -R a+w /etc/hyperledger \
  && chown -R :0 /var/hyperledger \
- && chmod -R a+w /var/hyperledger
+ && chmod -R a+w /var/hyperledger \
+ && mkdir /opt/gopath \
+ && chown -R :0 /opt/gopath \
+ && chmod -R a+w /opt/gopath
+ 
 
 EXPOSE 30110 30111
 CMD peer node start
