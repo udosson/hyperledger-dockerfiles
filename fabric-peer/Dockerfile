@@ -17,9 +17,10 @@ RUN mkdir /var/hyperledger/production \
  && chmod -R a+w /etc/hyperledger \
  && chown -R :0 /var/hyperledger \
  && chmod -R a+w /var/hyperledger \
- && mkdir /opt/gopath \
+ && mkdir /opt/gopath/src/github.com/hyperledger/fabric/peer \
  && chown -R :0 /opt/gopath \
- && chmod -R a+w /opt/gopath
+ && chmod -R a+w /opt/gopath 
+
  
 
 EXPOSE 30110 30111
