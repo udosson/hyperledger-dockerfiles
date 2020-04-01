@@ -1,19 +1,20 @@
-# This image is a microservice in golang for the Degree chaincode
-FROM golang:1.13.8-alpine AS build
+FROM udosson/udosson:chaincode-marbles
 
-COPY ./ /go/src/github.com/marbles
-WORKDIR /go/src/github.com/marbles
 
-# Build application
-RUN go build -o chaincode -v .
+# Install additional packages
+RUN apk add --no-cache \
+	libltdl \
+	rsync \
+	nano \
+	joe \
+	less \
+    p7zip \
+    busybox-extras
 
-# Production ready image
-# Pass the binary to the prod image
-FROM alpine:3.11 as prod
+# Fix permissions
 
-COPY --from=build /go/src/github.com/marbles/chaincode /app/chaincode
 
-USER 1000
+ 
 
-WORKDIR /app
+EXPOSE 30111
 CMD ./chaincode
