@@ -13,4 +13,7 @@ RUN apk add --no-cache \
 # Fix permissions
 RUN mkdir /fabric \
  && chown -R :0 /fabric \
- && chmod -R a+w /fabric
+ && chmod -R a+w /fabric\
+ && mkdir /opt/gopath \
+ && chown -R :0 /opt/gopath \
+ && chmod -R a+w /opt/gopath
