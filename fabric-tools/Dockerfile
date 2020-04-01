@@ -14,6 +14,6 @@ RUN apk add --no-cache \
 RUN mkdir /fabric \
  && chown -R :0 /fabric \
  && chmod -R a+w /fabric\
- && mkdir /opt/gopath/src/github.com/hyperledger/fabric/peer \
+ && mkdir -p /opt/gopath/src/github.com/hyperledger/fabric/peer \
  && chown -R :0 /opt/gopath \
  && chmod -R a+w /opt/gopath
