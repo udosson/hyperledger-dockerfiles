@@ -1,14 +1,15 @@
 FROM hyperledger/fabric-ca:1.4
 
 # Install additional packages
-RUN apk add --no-cache \
-	libltdl \
-	rsync \
-	nano \
-	joe \
-	less \
-    p7zip \
-    busybox-extras
+RUN apt-get -y update \
+ && apt-get -y upgrade \
+ && apt-get -y install libltdl \
+ && apt-get -y install rsync \
+ && apt-get -y install nano \
+ && apt-get -y install joe \
+ && apt-get -y install less\
+ && apt-get -y install busybox-extras
+
 
 # Fix permissions
 RUN chown -R :0 /etc/hyperledger \
