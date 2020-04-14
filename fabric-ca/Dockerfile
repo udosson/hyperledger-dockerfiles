@@ -3,13 +3,12 @@ FROM hyperledger/fabric-ca:1.4
 # Install additional packages
 RUN apt-get -y update \
  && apt-get -y upgrade \
- && apt-get -y install libltdl \
+ && apt-get -y install libltdl7 \
  && apt-get -y install rsync \
  && apt-get -y install nano \
  && apt-get -y install joe \
  && apt-get -y install less\
- && apt-get -y install busybox-extras
-
+ && apt-get -y install telnet
 
 # Fix permissions
 RUN chown -R :0 /etc/hyperledger \
