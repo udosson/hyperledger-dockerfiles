@@ -8,7 +8,10 @@ RUN apk add --no-cache \
 	joe \
 	less \
     p7zip \
-    busybox-extras
+    busybox-extras \
+	libtool \
+	libltdl
+
 
 # Fix permissions
 RUN mkdir /fabric \
