@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     p7zip \
     busybox-extras \
 	libtool \
-	libltdl
+	libltdl \
+	python3 
 
 
 # Fix permissions
