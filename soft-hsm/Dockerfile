@@ -11,7 +11,9 @@ RUN apk add --no-cache \
         automake \
         git \
         libtool \
+        libp11-kit-dev \
         openssl-dev \
+        pkg-config \
         rsync \
 	    nano \ 
         opensc
