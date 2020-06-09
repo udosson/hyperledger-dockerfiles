@@ -19,10 +19,10 @@ RUN apk add --no-cache \
     opensc
 
 # Fix permissions
-RUN mkdir -p ${SOFTHSM2_SOURCES} \
+RUN mkdir ${SOFTHSM2_SOURCES} \
     && chown -R :0 ${SOFTHSM2_SOURCES} \
     && chmod -R a+w ${SOFTHSM2_SOURCES} \
-    && mkdir -p ${SOFTHSM2_PRODUCTION} \
+    && mkdir ${SOFTHSM2_PRODUCTION} \
     && chown -R :0 ${SOFTHSM2_PRODUCTION} \
     && chmod -R a+w ${SOFTHSM2_PRODUCTION} 
 
