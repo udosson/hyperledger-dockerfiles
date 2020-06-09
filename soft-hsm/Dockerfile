@@ -27,8 +27,7 @@ RUN mkdir -p ${SOFTHSM2_SOURCES} \
     && chmod -R a+w ${SOFTHSM2_PRODUCTION} 
 
 # build and install SoftHSM2
-RUN git clone https://github.com/opendnssec/SoftHSMv2.git ${SOFTHSM2_SOURCES} \
-    && git checkout ${SOFTHSM2_VERSION} -b ${SOFTHSM2_VERSION}
+RUN git clone https://github.com/opendnssec/SoftHSMv2.git ${SOFTHSM2_SOURCES}
 WORKDIR ${SOFTHSM2_SOURCES}
 
 # RUN git checkout ${SOFTHSM2_VERSION} -b ${SOFTHSM2_VERSION} \
