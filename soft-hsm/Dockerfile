@@ -2,7 +2,7 @@ FROM alpine:3.12
 
 ENV SOFTHSM2_VERSION=2.5.0 \
     SOFTHSM2_SOURCES=/tmp/softhsm2 \
-    SOFTHSM2_PRODUCTION=/prod/
+    SOFTHSM2_PRODUCTION=/prod
 
 # install build dependencies
 RUN apk add --no-cache \
@@ -20,7 +20,7 @@ RUN apk add --no-cache \
 RUN mkdir -p ${SOFTHSM2_SOURCES} \
  && chown -R :0 ${SOFTHSM2_SOURCES} \
  && chmod -R a+w ${SOFTHSM2_SOURCES} \
- mkdir -p ${SOFTHSM2_PRODUCTION} \
+ && mkdir -p ${SOFTHSM2_PRODUCTION} \
  && chown -R :0 ${SOFTHSM2_PRODUCTION} \
  && chmod -R a+w ${SOFTHSM2_PRODUCTION} 
 
