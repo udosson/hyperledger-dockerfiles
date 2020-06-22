@@ -1,4 +1,4 @@
-FROM udosson/udosson:hyperledger-fabric-peer-golang-jq
+FROM hyperledger/fabric-peer:2.1
 
 
 # Install additional packages
