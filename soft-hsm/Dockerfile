@@ -16,6 +16,7 @@ RUN apk add --no-cache \
     pkgconfig \
     rsync \
     nano \ 
+    man-pages \
     opensc
 
 # Fix permissions
