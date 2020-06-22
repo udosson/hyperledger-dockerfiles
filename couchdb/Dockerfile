@@ -1,4 +1,4 @@
-FROM hyperledger/fabric-couchdb:0.4.18
+FROM hyperledger/fabric-couchdb:0.4.20
 
 # Edit docker-entrypoint. rmv all chwon and find commands and rmv gosu
 RUN sed -i 's/chown.*//g' /docker-entrypoint.sh \

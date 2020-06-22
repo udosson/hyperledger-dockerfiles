@@ -1,4 +1,4 @@
-FROM hyperledger/fabric-orderer:2.1
+FROM hyperledger/fabric-orderer:2.1.1
 
 # Install additional packages
 RUN apk add --no-cache \

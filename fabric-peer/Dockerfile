@@ -1,4 +1,4 @@
-FROM hyperledger/fabric-peer:2.1
+FROM hyperledger/fabric-peer:2.1.1
 
 
 # Install additional packages
