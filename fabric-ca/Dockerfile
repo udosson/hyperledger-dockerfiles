@@ -1,4 +1,4 @@
-FROM hyperledger/fabric-ca:1.4
+FROM hyperledger/fabric-ca:1.4.7
 
 # Install additional packages
 RUN apt-get -y update \

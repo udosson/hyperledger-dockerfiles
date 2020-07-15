@@ -1,4 +1,4 @@
-FROM hyperledger/fabric-tools:2.0
+FROM hyperledger/fabric-tools:2.2
 
 # Install additional packages
 RUN apk add --no-cache \
