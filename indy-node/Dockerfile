@@ -13,10 +13,3 @@ RUN chown -R :0 /var/lib/indy/ \
  
 # Expose ports
 EXPOSE 9701 9702
-
-init_indy_node Commerzbank 1.2.3.4 9701 1.2.3.4 9702 commerzbank000000000000000000001
-start_indy_node Commerzbank 0.0.0.0 9701 0.0.0.0 9702 
-3WDBTLJLnv4cKpCGUDXCan1m8WLxAopYNy2vJcqUVyPz
-3WDBTLJLnv4cKpCGUDXCan1m8WLxAopYNy2vJcqUVyPz
-
-start_indy_node Commerzbank 0.0.0.0 9701 0.0.0.0 9702
