@@ -22,7 +22,9 @@ RUN pip3 install -U \
 # Install Indy-node
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 
 RUN bash -c 'echo "deb https://repo.sovrin.org/deb xenial stable" >> /etc/apt/sources.list'
+RUN sed -i "s/https/http/g" /etc/apt/sources.list
 RUN apt-get update -y && apt-get install -y indy-node
+
 
 # Prepare the environments
 RUN sed -i "s/None/'ssi4de_test'/" /etc/indy/indy_config.py
