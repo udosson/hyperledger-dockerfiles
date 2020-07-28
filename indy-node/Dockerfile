@@ -1,6 +1,6 @@
 FROM udosson/hyperledger-indy-node:latest
 
-RUN validator-info
+RUN bash -c "validator-info"
 
 # Fix permission for OpenShift
 RUN chown -R :0 /var/lib/indy/ \
