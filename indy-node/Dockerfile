@@ -13,7 +13,8 @@ RUN apt-get update -y && apt-get install -y \
 	supervisor \
     rsync \
 	vim \
-	curl
+	curl \
+	software-properties-common
 
 RUN pip3 install -U \
 	pip==9.0.3 \
@@ -32,8 +33,9 @@ RUN sed -i "s/None/'ssi4de_test'/" /etc/indy/indy_config.py
 
 
 # Retrieve and store pool_transaction_genesis file
-RUN mkdir -p /var/lib/indy/ssi4de_test \
-curl https://lissi-network.azurewebsites.net/genesis/pool_transactions_lissitest_genesis --output /var/lib/indy/ssi4de_test/pool_transactions_genesis
+RUN mkdir -p /var/lib/indy/ssi4de_test  
+
+RUN curl https://lissi-network.azurewebsites.net/genesis/pool_transactions_lissitest_genesis --output /var/lib/indy/ssi4de_test/pool_transactions_genesis
 
 
 # Fix permission for OpenShift
