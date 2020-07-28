@@ -1,6 +1,5 @@
 FROM udosson/hyperledger-indy-node:latest
 
-RUN useradd -ms /bin/bash indy
 RUN validator-info
 
 # Fix permission for OpenShift
