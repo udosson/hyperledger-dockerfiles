@@ -8,7 +8,7 @@ RUN chown -R :0 /var/lib/indy/ \
  && chmod -R a+w /var/log/indy/ \
  && chown -R :0 /etc/indy/ \
  && chmod -R a+w /etc/indy/ \    
-
+ && chwon indy:indy /var/log/indy/validator-info.log
  
 # Expose ports
 EXPOSE 9701 9702
