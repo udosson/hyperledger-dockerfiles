@@ -1,6 +1,6 @@
 FROM udosson/hyperledger-indy-node:latest
 
-RUN groupadd -r indy && useradd -r -g indy indy
+# RUN groupadd -r indy && useradd -r -g indy indy
 
 # Fix permission for OpenShift
 RUN chgrp -R 0 /var/lib/indy/ \
