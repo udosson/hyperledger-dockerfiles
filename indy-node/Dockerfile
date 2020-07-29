@@ -1,7 +1,9 @@
 FROM udosson/hyperledger-indy-node:latest
 
 # RUN groupadd -r indy && useradd -r -g indy indy
-
+RUN apt-get && apt-get install -y \
+	nano 
+    
 # Fix permission for OpenShift
 RUN chgrp -R 0 /var/lib/indy/ \
  && chmod -R g=u /var/lib/indy/ \
