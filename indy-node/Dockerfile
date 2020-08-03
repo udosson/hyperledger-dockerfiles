@@ -12,6 +12,10 @@ RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/maste
 
 RUN  chgrp 0 /tmp/prepareEtcPasswd.sh \
  && chmod 755 /tmp/prepareEtcPasswd.sh
+
+RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/start-ssi4de-node.sh --output /tmp/start-ssi4de-node.sh
+RUN  chgrp 0 /tmp/start-ssi4de-node.sh \
+ && chmod 755 /tmp/start-ssi4de-node.sh
 # RUN usermod -a -G 0 indy
 
 # Fix permission for OpenShift
