@@ -8,6 +8,8 @@ RUN apt-get install -y \
 
 RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/passwd.template --output /tmp/passwd.template
 
+RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/prepareEtcPasswd.sh /tmp/prepareEtcPasswd.sh
+
 # RUN usermod -a -G 0 indy
 
 # Fix permission for OpenShift
