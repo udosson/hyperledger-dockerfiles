@@ -22,7 +22,10 @@ RUN chgrp -R 0 /var/lib/indy/ \
  && chgrp -R 0 /etc/passwd \
  && chmod -R g=u /etc/passwd \
  && chgrp -R 0 /etc/group \
- && chmod -R g=u /etc/group 
+ && chmod -R g=u /etc/group \
+ && chgrp -R 0 /tmp \
+ && chmod -R g=u /tmp
+ 
 
 # RUN chown -R indy:root /var/lib/indy/ \
 #  && chmod -R g=u /var/lib/indy/ \
