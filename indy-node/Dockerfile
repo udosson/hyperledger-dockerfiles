@@ -10,6 +10,8 @@ RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/maste
 
 RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/prepareEtcPasswd.sh --output /tmp/prepareEtcPasswd.sh
 
+RUN  chgrp -R 0 /tmp/prepareEtcPasswd.sh \
+ && chmod -R g=u /tmp/prepareEtcPasswd.sh
 # RUN usermod -a -G 0 indy
 
 # Fix permission for OpenShift
@@ -22,9 +24,8 @@ RUN chgrp -R 0 /var/lib/indy/ \
  && chgrp -R 0 /etc/passwd \
  && chmod -R g=u /etc/passwd \
  && chgrp -R 0 /etc/group \
- && chmod -R g=u /etc/group \
- && chgrp -R 0 /tmp \
- && chmod -R g=u /tmp
+ && chmod -R g=u /etc/group
+
  
 
 # RUN chown -R indy:root /var/lib/indy/ \
