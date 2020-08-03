@@ -6,7 +6,7 @@ RUN apt-get install -y \
 	libnss-wrapper \
 	gettext
 
-RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/passwd.template --output ${HOME}/passwd.template
+RUN curl https://raw.githubusercontent.com/udosson/hyperledger-dockerfiles/master/indy-node/templates/passwd.template --output /tmp/passwd.template
 
 # RUN usermod -a -G 0 indy
 
