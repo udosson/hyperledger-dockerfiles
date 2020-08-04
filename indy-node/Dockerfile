@@ -43,3 +43,5 @@ EXPOSE 9701 9702
 
 # Set user
 USER 1000
+
+ENTRYPOINT [ "/tmp/start-ssi4de-node.sh", "DeutscheBahn", "0.0.0.0", "Zcn3c6St7ch9Whw1JCh1l2uwHakfk2La" ]
