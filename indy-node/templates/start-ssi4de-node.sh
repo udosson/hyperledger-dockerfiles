@@ -39,7 +39,6 @@ SHA256_POOL_TRANSACTION_GENESIS_CHECKSUM=$(sha256sum pool_transactions_genesis |
 
 # mv /tmp/SSI4DE_Genesis/domain_transactions_genesis /var/lib/indy/ssi4de_test
 mv /tmp/SSI4DE_Genesis/pool_transactions_genesis /var/lib/indy/ssi4de_test
-sleep 10000
 init_indy_node ${NODE_ALIAS} ${SERVICE_IP} 9701 ${SERVICE_IP} 9702 ${SEED_PHRASE}
 start_indy_node ${NODE_ALIAS} ${SERVICE_IP} 9701 ${SERVICE_IP} 9702
 
