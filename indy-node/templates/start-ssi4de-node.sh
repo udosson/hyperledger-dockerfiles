@@ -2,7 +2,9 @@
 
 # Sets new /etc/passwd file
 export USER_ID=$(id -u)
+echo $USER_ID
 export GROUP_ID=$(id -g)
+echo $GROUP_ID
 envsubst < /tmp/passwd.template > /tmp/passwd
 export LD_PRELOAD=/usr/lib/libnss_wrapper.so
 export NSS_WRAPPER_PASSWD=/tmp/passwd
