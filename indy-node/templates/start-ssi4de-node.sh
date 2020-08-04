@@ -2,9 +2,7 @@
 
 # Sets new /etc/passwd file
 export USER_ID=$(id -u)
-echo $USER_ID
 export GROUP_ID=$(id -g)
-echo $GROUP_ID
 envsubst < /tmp/passwd.template > /tmp/passwd
 export LD_PRELOAD=/usr/lib/libnss_wrapper.so
 export NSS_WRAPPER_PASSWD=/tmp/passwd
@@ -43,3 +41,6 @@ SHA256_POOL_TRANSACTION_GENESIS_CHECKSUM=$(sha256sum pool_transactions_genesis |
 mv /tmp/SSI4DE_Genesis/pool_transactions_genesis /var/lib/indy/ssi4de_test
 init_indy_node ${NODE_ALIAS} ${SERVICE_IP} 9701 ${SERVICE_IP} 9702 ${SEED_PHRASE}
 start_indy_node ${NODE_ALIAS} ${SERVICE_IP} 9701 ${SERVICE_IP} 9702
+
+
+sleep 10000
