@@ -29,7 +29,7 @@ SHA256_DOMAIN_TRANSACTION_GENESIS=$(sed '5q;d' README.md)
 SHA256_DOMAIN_TRANSACTION_GENESIS_CHECKSUM=$(sha256sum domain_transactions_genesis | awk '{print $1}')
 # SHA256_POOL_TRANSACTION_GENESIS_CHECKSUM=$(sha256sum pool_transactions_genesis | awk '{print $1}')
 
-if [ "${SHA256_DOMAIN_TRANSACTION_GENESIS}" = "${SHA256_DOMAIN_TRANSACTION_GENESIS_CHECKSUM}" ]; then
+if [ "${SHA256_DOMAIN_TRANSACTION_GENESIS}" -eq "${SHA256_DOMAIN_TRANSACTION_GENESIS_CHECKSUM}" ]; then
     mv /tmp/domain_transactions_genesis /var/lib/indy/ssi4de_test
     # mv /tmp/pool_transactions_genesis /var/lib/indy/ssi4de_test
     init_indy_node ${NODE_ALIAS} ${SERVICE_IP} 9701 ${SERVICE_IP} 9702 ${SEED_PHRASE}
