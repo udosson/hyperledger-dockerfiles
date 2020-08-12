@@ -23,5 +23,7 @@ RUN cp -R /chaincode/input/. /chaincode/output \
 RUN cp -R /chaincode/output/. /usr/local/src
 WORKDIR /usr/local/src
 
+EXPOSE 30111
 # Start chaincode server
 CMD [ "npm", "run", "start" ]
+
