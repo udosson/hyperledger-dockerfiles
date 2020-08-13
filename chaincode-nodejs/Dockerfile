@@ -1,6 +1,6 @@
 # This image is a microservice in golang for the Degree chaincode
-ARG NODE_VER=12.13.0
-FROM node:${NODE_VER}-alpine
+# ARG NODE_VER=12.13.0
+FROM node:12.13.0-alpine
 
 # Update and add packages
 RUN apk add --no-cache \
