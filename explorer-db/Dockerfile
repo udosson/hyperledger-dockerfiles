@@ -9,7 +9,7 @@ RUN apk add --no-cache \
 	joe \
 	less \
     p7zip \
-	libnss-wrapper \
+	nss_wrapper \
 	gettext \
     busybox-extras
 
