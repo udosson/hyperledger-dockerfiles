@@ -37,5 +37,9 @@ RUN chown -R :0 /var/lib/postgresql/data \
 	&& chmod -R a+w /opt \
 	&& chgrp -R 0 /tmp/ \
 	&& chmod -R g=u /tmp/ \
+	&& chgrp -R 0 /etc/passwd \
+	&& chmod -R g=u /etc/passwd \
 	&& chgrp 0 /tmp/start_postgres.sh \
 	&& chmod 755 /tmp/start_postgres.sh
+
+
