@@ -12,6 +12,7 @@ RUN apk add --no-cache \
     busybox-extras
 
 # Fix permissions
-RUN mkdir /var/lib/postgresql/data \
- && chown -R :0 /var/lib/postgresql/data \
- && chmod -R a+w /var/lib/postgresql/data 
+RUN chown -R :0 /var/lib/postgresql/data \
+ && chmod -R a+w /var/lib/postgresql/data \
+ && chown -R :0 /opt \
+ && chmod -R a+w /opt
