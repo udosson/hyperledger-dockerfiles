@@ -28,4 +28,8 @@ RUN chown -R :0 /var/lib/postgresql/data \
 	&& chgrp 0 /tmp/start_postgres.sh \
 	&& chmod 755 /tmp/start_postgres.sh
 
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+EXPOSE 5432
+
 
