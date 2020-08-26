@@ -15,9 +15,11 @@ ADD ./templates/passwd.template /tmp/passwd.template
 ADD ./scripts/start_postgres.sh /tmp/start_postgres.sh
 
 # Fix permissions
-RUN chown -R :0 /var/lib/postgresql/data \
-	&& chmod -R g=u /var/lib/postgresql/data \
-	&& chown -R :0 /opt \
+RUN chgrp -R 0 /var/lib/postgresql \
+	&& chmod -R g=u /var/lib/postgresql \
+	&& chgrp -R 0 /var/run/postgresql \
+	&& chmod -R g=u /var/run/postgresql \
+	&& chgrp -R 0 /opt \
 	&& chmod -R g=u /opt \
 	&& chgrp -R 0 /tmp/ \
 	&& chmod -R g=u /tmp/ \
