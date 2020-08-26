@@ -19,6 +19,8 @@ RUN chgrp -R 0 /var/lib/postgresql \
 	&& chmod -R g=u /var/lib/postgresql \
 	&& chgrp -R 0 /var/run/postgresql \
 	&& chmod -R g=u /var/run/postgresql \
+	&& chgrp -R 0 /docker-entrypoint-initdb.d \
+	&& chmod -R g=u /docker-entrypoint-initdb.d \
 	&& chgrp -R 0 /opt \
 	&& chmod -R g=u /opt \
 	&& chgrp -R 0 /tmp/ \
