@@ -7,7 +7,6 @@ RUN yum -y install joe \
     && yum -y install net-tools \
     && yum -y install less \
     && yum -y install jq \
-    && yum -y install less \
     && yum -y install nodejs \
     && yum -y install less 
 

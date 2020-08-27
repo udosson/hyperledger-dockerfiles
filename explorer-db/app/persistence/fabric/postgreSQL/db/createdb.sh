@@ -35,10 +35,10 @@ linux*)
 if [ $(id -un) = 'postgres' ]; then
   PSQL="psql"
 else
-  PSQL="sudo -u postgres psql"
+  # PSQL="sudo -u postgres psql"
+  # Had to fix this because of OpenShift
+  PSQL="psql"
 fi;
 ${PSQL} -v dbname=$DATABASE -v user=$USER -v passwd=$PASSWD -f ./explorerpg.sql ;
 ${PSQL} -v dbname=$DATABASE -v user=$USER -v passwd=$PASSWD -f ./updatepg.sql ;;
 esac
-
-
