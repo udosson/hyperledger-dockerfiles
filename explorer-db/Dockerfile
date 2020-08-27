@@ -1,37 +1,31 @@
-FROM hyperledger/explorer-db:1.1.2
+FROM centos/postgresql-10-centos7:latest
 
-# Install additional packages
-RUN apk add --no-cache \
-	libltdl \
-	rsync \
-	nano \
-	joe \
-	less \
-	p7zip \
-	busybox-extras
-
-# Need to set user to postgres
-ADD ./templates/passwd.template /tmp/passwd.template
-ADD ./scripts/start_postgres.sh /tmp/start_postgres.sh
-
-# Fix permissions
-RUN chgrp -R 0 /var/lib/postgresql \
-	&& chmod -R g=u /var/lib/postgresql \
-	&& chgrp -R 0 /var/run/postgresql \
-	&& chmod -R g=u /var/run/postgresql \
-	&& chgrp -R 0 /docker-entrypoint-initdb.d \
-	&& chmod -R g=u /docker-entrypoint-initdb.d \
-	&& chgrp -R 0 /opt \
-	&& chmod -R g=u /opt \
-	&& chgrp -R 0 /tmp/ \
-	&& chmod -R g=u /tmp/ \
-	&& chgrp -R 0 /etc/passwd \
-	&& chmod -R g=u /etc/passwd \
-	&& chgrp 0 /tmp/start_postgres.sh \
-	&& chmod 755 /tmp/start_postgres.sh
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-
-EXPOSE 5432
+USER root
+RUN yum -y install epel-release
+RUN yum -y install joe \
+    && yum -y install telnet \
+    && yum -y install net-tools \
+    && yum -y install less \
+    && yum -y install jq \
+    && yum -y install less \
+    && yum -y install nodejs \
+    && yum -y install less 
 
 
+# default database name for HLF Explorer db connection
+ENV DATABASE_DATABASE 	fabricexplorer
+
+# default username for HLF Explorer db connection
+ENV DATABASE_USERNAME 	hppoc
+
+# default password for HLF Explorer db connection
+ENV DATABASE_PASSWORD 	password
+
+
+# Copy files
+COPY app/persistence/fabric/postgreSQL/db/explorerpg.sql  /opt/explorerpg.sql
+COPY app/persistence/fabric/postgreSQL/db/updatepg.sql    /opt/updatepg.sql
+COPY app/persistence/fabric/postgreSQL/db/createdb.sh     /docker-entrypoint-initdb.d/createdb.sh
+COPY app/persistence/fabric/postgreSQL/db/processenv.js   /opt/processenv.js
+
+WORKDIR /opt
